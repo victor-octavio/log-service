@@ -3,15 +3,13 @@ package project.logservice.interfaces.rest;
 import ch.qos.logback.core.status.InfoStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import project.logservice.application.LogService;
 import project.logservice.domain.model.Level;
 import project.logservice.domain.model.LogEvent;
 import project.logservice.interfaces.rest.dto.LogEventRequest;
 import project.logservice.interfaces.rest.dto.LogEventResponse;
+import project.logservice.interfaces.rest.dto.LogSearchRequest;
 import project.logservice.shared.mapper.LogEventMapper;
 
 import java.time.Instant;
@@ -28,14 +26,14 @@ public class LogController {
   }
 
   @PostMapping
-  public ResponseEntity<LogEventResponse> createLog(LogEventRequest logEventRequest) {
+  public ResponseEntity<LogEventResponse> createLog(@RequestBody LogEventRequest logEventRequest) {
     LogEvent logEvent = LogEventMapper.toDomain(logEventRequest);
     return ResponseEntity.status(201).body(LogEventMapper.toResponse(logService.createLog(logEvent)));
   }
 
   @GetMapping
-  public ResponseEntity<List<LogEventResponse>> getLog(String application, Level level, Instant start, Instant end) {
-    List<LogEvent> logs = logService.searchLogs(application, level, start, end);
+  public ResponseEntity<List<LogEventResponse>> getLog(@RequestBody LogSearchRequest searchRequest) {
+    List<LogEvent> logs = logService.searchLogs(searchRequest);
     List<LogEventResponse> responses = logs.stream()
         .map(LogEventMapper::toResponse)
         .collect(Collectors.toList());

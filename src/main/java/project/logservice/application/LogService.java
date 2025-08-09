@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import project.logservice.domain.model.Level;
 import project.logservice.domain.model.LogEvent;
 import project.logservice.domain.repository.LogRepository;
+import project.logservice.interfaces.rest.dto.LogSearchRequest;
 
 import java.time.Instant;
 import java.util.List;
@@ -22,7 +23,13 @@ public class LogService {
     return logRepository.save(logEvent);
   }
 
-  public List<LogEvent> searchLogs(String application, Level level, Instant start, Instant end) {
-    return logRepository.findByApplicationAndLevelAndTimestampBetween(application, level, start, end);
+  public List<LogEvent> searchLogs(LogSearchRequest logSearchRequest) {
+    return logRepository
+            .findByApplicationAndLevelAndTimestampBetween(
+                    logSearchRequest.application(),
+                    logSearchRequest.level(),
+                    logSearchRequest.start(),
+                    logSearchRequest.end()
+            );
   }
 }
